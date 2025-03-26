@@ -1,7 +1,10 @@
 package com.example.orderproduct.utils;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,5 +43,14 @@ public class CommonUtils {
         else{
             return false;
         }
+    }
+
+    // Hàm chuyển MultipartFile -> Base64
+    public static String convertToBase64(MultipartFile file) throws IOException {
+        byte[] fileBytes;
+        try (InputStream inputStream = file.getInputStream()) {
+            fileBytes = inputStream.readAllBytes();
+        }
+        return Base64.encodeBase64String(fileBytes);
     }
 }

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
-    @Query("select r.id from RoleEntity r where r.id = :ids ")
+    @Query("select r.id from RoleEntity r where r.id IN :ids ")
     List<Long> existingRoles(@Param("ids") List<Long> ids);
 
     @Query(value = "SELECT * FROM (" +

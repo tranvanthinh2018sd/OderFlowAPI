@@ -11,6 +11,7 @@ public class MessageConst {
     public static final String CREATE_USER_FAIL = "user.create.fail";
     public static final String UPDATE_USER_SUCCESS = "user.update.success";
     public static final String CREATE_USER_SUCCESS = "user.create.success";
+    public static final String USER_ALREDY_EXISTS = "user.alredy.exists";
     public static final String LIST_USER_NOT_FOUND = "list.user.not.found";
 
     public static final String ROLE_NOT_FOUND = "role.not.found";

@@ -96,7 +96,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
             String username = jwtService.extractUsername(accessToken);
-            log.info("##########Username: "+username );
             UserEntity user = userRepository.findByUserName(username).orElseThrow(
                     () -> new ResourceNotFoundException(MessageConst.ACCOUNT_NOT_FOUND)
             );

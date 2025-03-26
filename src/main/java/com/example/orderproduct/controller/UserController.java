@@ -36,12 +36,12 @@ public class UserController {
         return reponseDTO;
     }
     @PostMapping("/create")
-    public BaseReponseDTO<UserReponseDTO> createUser( UserRequestDTO requestDTO, @RequestParam(value = "image") MultipartFile image, Locale locale) throws IOException {
-        BaseReponseDTO<UserReponseDTO> reponseDTO = userService.createUser(requestDTO, image, locale);
+    public BaseReponseDTO<UserReponseDTO> createUser( UserRequestDTO requestDTO, @RequestParam(value = "fileImage", required = false) MultipartFile fileImage, Locale locale) throws IOException {
+        BaseReponseDTO<UserReponseDTO> reponseDTO = userService.createUser(requestDTO, fileImage, locale);
         return reponseDTO;
     }
     @PostMapping("/update")
-    public BaseReponseDTO<UserReponseDTO> updateUser(@RequestBody UserRequestDTO requestDTO, Locale locale) {
+    public BaseReponseDTO<UserReponseDTO> updateUser(UserRequestDTO requestDTO, @RequestParam(value = "fileImage", required = false) MultipartFile fileImage, Locale locale) {
         BaseReponseDTO<UserReponseDTO> reponseDTO = userService.updateUser(requestDTO, locale);
         return reponseDTO;
     }

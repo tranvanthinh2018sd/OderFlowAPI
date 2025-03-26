@@ -11,6 +11,7 @@ import com.example.orderproduct.repository.RoleRepository;
 import com.example.orderproduct.repository.UserRepository;
 import com.example.orderproduct.repository.UserRoleRepository;
 import com.example.orderproduct.service.MailService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Component
 public class UserMapper {
     @Autowired
@@ -71,10 +73,12 @@ public class UserMapper {
         userEntity.setCreaDate(new Date());
         userEntity.setStatus(1L);
         userRepository.save(userEntity);
+        log.info("RoleID: {}", roleId);
         List<Long> roleIds = roleRepository.existingRoles(roleId);
         if(roleIds.size() != roleId.size()){
             throw new ResourceNotFoundException(MessageConst.LIST_ROLE_NOT_FOUND);
         }
+        log.info("RoleIds: {}", roleIds);
         List<UserRoleEnity> userRoles = new ArrayList<>();
         for(Long role : roleId){
             UserRoleEnity userRoleEnity = new UserRoleEnity();

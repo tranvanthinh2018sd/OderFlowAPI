@@ -17,13 +17,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.example.orderproduct.utils.CommonUtils.convertToBase64;
 
 @Slf4j
 @Service
@@ -40,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private MessageSource messageSource;
     @Autowired
     private MailService mailService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -121,28 +127,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public BaseReponseDTO<UserReponseDTO> createUser(UserRequestDTO request, MultipartFile imageRequest, Locale locale) throws IOException {
         try{
-            String image = CommonUtils.saveImage(imageRequest);
+            String image = CommonUtils.convertToBase64(imageRequest);
             request.setImage(image);
+            Optional<UserEntity> user = userRepository.findByUserName(request.getUsername());
+            if(user.isPresent()) {
+                return BaseReponseDTO.<UserReponseDTO>builder()
+                        .code(-1)
+                        .isSuccess(false)
+                        .message(messageSource.getMessage(MessageConst.USER_ALREDY_EXISTS, null, locale))
+                        .data(null)
+                        .build();
+            }
+            request.setPassword(passwordEncoder.encode(request.getPassword()));
             UserReponseDTO reponse = userMapper.createUser(request, request.getRoleId());
             if(reponse.getId() != null){
                 mailService.sendComfirmLink(reponse.getEmail(),reponse.getId(), "sercretCode");
             }
-            if(reponse == null){
-                return BaseReponseDTO.<UserReponseDTO>builder()
-                        .code(-1)
-                        .isSuccess(false)
-                        .message(messageSource.getMessage(MessageConst.CREATE_USER_FAIL,null,locale))
-                        .data(null)
-                        .build();
-            }
-            else {
-                return BaseReponseDTO.<UserReponseDTO>builder()
-                        .code(0)
-                        .isSuccess(true)
-                        .message(messageSource.getMessage(MessageConst.CREATE_USER_SUCCESS, null, locale))
-                        .data(reponse)
-                        .build();
-            }
+            return BaseReponseDTO.<UserReponseDTO>builder()
+                    .code(0)
+                    .isSuccess(true)
+                    .message(messageSource.getMessage(MessageConst.CREATE_USER_SUCCESS, null, locale))
+                    .data(reponse)
+                    .build();
+
         } catch (Exception e) {
             return BaseReponseDTO.<UserReponseDTO>builder()
                     .code(-2)

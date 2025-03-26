@@ -29,7 +29,8 @@ public class UserEntity {
     private String email;
     @Column(name = "PHONE")
     private String phone;
-    @Column(name = "IMAGE")
+    @Lob
+    @Column(name = "IMAGE", columnDefinition = "CLOB")
     private String image;
     @Column(name = "ADDRESS")
     private String address;
