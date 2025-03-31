@@ -9,6 +9,7 @@ import com.example.orderproduct.dto.response.BaseReponseDTO;
 import com.example.orderproduct.dto.response.LoginReponseDTO;
 
 import com.example.orderproduct.dto.response.RoleReponseDTO;
+import com.example.orderproduct.dto.response.UserReponseDTO;
 import com.example.orderproduct.entity.RoleEntity;
 import com.example.orderproduct.entity.RoleModuleEntity;
 import com.example.orderproduct.entity.UserEntity;
@@ -20,17 +21,22 @@ import com.example.orderproduct.repository.RoleModuleReponsitory;
 import com.example.orderproduct.repository.RoleRepository;
 import com.example.orderproduct.repository.UserRepository;
 import com.example.orderproduct.service.AuthService;
+import com.example.orderproduct.service.MailService;
+import com.example.orderproduct.service.PasswordResetTokenService;
+import com.example.orderproduct.utils.ResponseUtils;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -45,7 +51,9 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final RoleModuleReponsitory roleModuleReponsitory;
     private final RoleMapper roleMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final MessageSource messageSource;
+    private final PasswordResetTokenService passwordResetTokenService;
+    private final MailService mailService;
 
     @Override
     public BaseReponseDTO<LoginReponseDTO> login(LoginRequestDTO loginRequestDTO,HttpServletResponse httpServletResponse, Locale locale) {
@@ -68,11 +76,7 @@ public class AuthServiceImpl implements AuthService {
            String refreshToken = jwtService.generateRefreshToken(userDetails);
            setTokenToCookie(httpServletResponse, accessToken, refreshToken);
            LoginReponseDTO loginResponseDTO = generateLoginResponse(username, role);
-           return BaseReponseDTO.<LoginReponseDTO>builder()
-                   .code(0)
-                   .isSuccess(true)
-                   .data(loginResponseDTO)
-                   .build();
+           return ResponseUtils.buildResponse(0, MessageConst.LOGIN_SUCCESS, locale, null,loginResponseDTO, messageSource);
        }
        catch (InternalAuthenticationServiceException exception) {
            throw new UnauthorizedException(MessageConst.ACCOUNT_NOT_FOUND);
@@ -112,4 +116,76 @@ public class AuthServiceImpl implements AuthService {
                 reponseDTO
         );
     }
+
+    @Override
+    public Long getUserIdFromToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        String accessToken = authorizationHeader.substring(7);
+
+        String username = jwtService.extractUsername(accessToken);
+
+        UserEntity user = userRepository
+                .findByUserName(username)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConst.ACCOUNT_NOT_FOUND));
+
+        return user.getId();
+    }
+    @Override
+    public BaseReponseDTO<UserReponseDTO> getInformation(HttpServletRequest request, Locale locale) {
+            try{
+                String authorizationHeader = request.getHeader("Authorization");
+                String accessToken = authorizationHeader.substring(7); // Loại bỏ "Bearer "
+                String username = jwtService.extractUsername(accessToken);
+                log.info("#UserName: {}", username);
+                UserEntity user = userRepository
+                        .findByUserName(username)
+                        .orElseThrow(() -> new ResourceNotFoundException(MessageConst.ACCOUNT_NOT_FOUND));
+                UserReponseDTO reponse = new UserReponseDTO(
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getPhone(),
+                        user.getImage(),
+                        user.getAddress()
+                );
+                return ResponseUtils.buildResponse(0, MessageConst.GET_DATA_SUCCESS, locale, null,reponse, messageSource);
+            } catch (Exception e) {
+                log.error("#Error: "+e.getMessage());
+                return BaseReponseDTO.<UserReponseDTO>builder()
+                        .code(-1)
+                        .isSuccess(true)
+                        .message(e.getMessage())
+                        .data(null)
+                        .build();
+            }
+    }
+
+    @Override
+    public BaseReponseDTO<String> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Locale locale) {
+        Arrays.stream(httpServletRequest.getCookies())
+            .filter(cookie ->
+                    cookie.getName().equals(AppConst.ACCESS_TOKEN) ||
+                            cookie.getName().equals(AppConst.REFRESH_TOKEN))
+        .forEach(cookie -> {
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            httpServletResponse.addCookie(cookie);
+        });
+        return ResponseUtils.buildResponse(0, MessageConst.LOGOUT_SUCCESS, locale, null,null, messageSource);
+    }
+
+    @Override
+    public BaseReponseDTO<Object> sentOtpResetPassword(String email, Locale locale) throws MessagingException {
+        UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
+        if(userEntity== null){
+            return ResponseUtils.buildResponse(-1, MessageConst.EMAIL_NOT_FOUND, locale, null,null, messageSource);
+
+        }
+        String token = UUID.randomUUID().toString().substring(0,8).toUpperCase();
+        Long passwordResetTokenId = passwordResetTokenService.createPasswordResetTokenForUser(userEntity.getId(), token);
+        mailService.sendSimpleMail(email, "SenOtp", token);
+
+        return ResponseUtils.buildResponse(0, MessageConst.SENT_OTP_SUCCESS, locale, null,passwordResetTokenId, messageSource);
+    }
+
 }

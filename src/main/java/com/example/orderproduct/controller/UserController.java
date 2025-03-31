@@ -24,30 +24,46 @@ public class UserController {
 
     public final UserService userService;
 
-    @GetMapping("/all")
+    @GetMapping()
     public BaseReponseDTO<List<UserReponseDTO>> getAllUsers(String search, int page, int size, Locale locale) {
+        log.info("#Search: {}, Page: {}, Size: {}", search, page, size);
         BaseReponseDTO<List<UserReponseDTO>> reponseDTO = userService.getAllUserPaging(search,page, size, locale);
+        log.info("#Response: {}", reponseDTO);
         return reponseDTO;
     }
 
-    @GetMapping("/by-id")
+    @GetMapping("/{id}")
     public BaseReponseDTO<UserReponseDTO> getAllById(Long id, Locale locale) {
-        BaseReponseDTO<UserReponseDTO> reponseDTO = userService.getUserById(id, locale);
-        return reponseDTO;
+        log.info("#Id: {}", id);
+        BaseReponseDTO<UserReponseDTO> reponse = userService.getUserById(id, locale);
+        log.info("#Reponse: {}", reponse);
+        return reponse;
     }
     @PostMapping("/create")
-    public BaseReponseDTO<UserReponseDTO> createUser( UserRequestDTO requestDTO, @RequestParam(value = "fileImage", required = false) MultipartFile fileImage, Locale locale) throws IOException {
-        BaseReponseDTO<UserReponseDTO> reponseDTO = userService.createUser(requestDTO, fileImage, locale);
-        return reponseDTO;
+    public BaseReponseDTO<UserReponseDTO> createUser(
+            @RequestBody UserRequestDTO requestDTO,
+            @RequestParam(value = "fileImage", required = false) MultipartFile fileImage,
+            Locale locale
+    ) throws IOException {
+        log.info("#Request create: {}", requestDTO);
+        BaseReponseDTO<UserReponseDTO> reponseDTO =  userService.createUser(requestDTO, fileImage, locale);
+        log.info("#Response update: {}", reponseDTO);
+         return reponseDTO;
     }
     @PostMapping("/update")
-    public BaseReponseDTO<UserReponseDTO> updateUser(UserRequestDTO requestDTO, @RequestParam(value = "fileImage", required = false) MultipartFile fileImage, Locale locale) {
-        BaseReponseDTO<UserReponseDTO> reponseDTO = userService.updateUser(requestDTO, locale);
+    public BaseReponseDTO<UserReponseDTO> updateUser(
+            @RequestBody UserRequestDTO requestDTO,
+            @RequestParam(value = "fileImage", required = false) MultipartFile fileImage,
+            Locale locale
+    ) {
+        log.info("#Request update: {}", requestDTO);
+        BaseReponseDTO<UserReponseDTO> reponseDTO = userService.updateUser(requestDTO, fileImage, locale);
+        log.info("#Response update: {}", reponseDTO);
         return reponseDTO;
     }
     @GetMapping("/confirm/{userId}")
-    public BaseReponseDTO<String> confirm(@PathVariable Long userId, @RequestParam String verifyCode) {
-            return userService.confirmUser(userId, verifyCode);
+    public BaseReponseDTO<String> confirm(@PathVariable Long userId, @RequestParam String verifyCode, Locale locale) {
+            return userService.confirmUser(userId, verifyCode, locale);
 
     }
 }

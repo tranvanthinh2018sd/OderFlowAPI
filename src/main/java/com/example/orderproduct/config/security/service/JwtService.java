@@ -35,6 +35,7 @@ public class JwtService {
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+    
 
     public Boolean extractIsAccessToken(String token) {
         return extractClaim(token, claims -> claims.get(AppConst.IS_ACCESS_TOKEN_CLAIM, Boolean.class));
@@ -119,6 +120,7 @@ public class JwtService {
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
+        log.info("Subject: {}", claims.getSubject());
         return claimsResolver.apply(claims);
     }
 

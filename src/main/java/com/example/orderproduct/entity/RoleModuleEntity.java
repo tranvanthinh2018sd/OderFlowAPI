@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = TableConst.OD_ROLE_MODULE)
+@Table(name = TableConst.ROLE_MODULE)
 public class RoleModuleEntity {
     @Id
     @SequenceGenerator(name = TableConst.SEQ_ROLE_MODULE, sequenceName = TableConst.SEQ_ROLE_MODULE, allocationSize = 1)

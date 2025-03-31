@@ -22,49 +22,48 @@ public class ControllerExceptionHandler {
     private final MessageUtils messageUtils;
 
     @ExceptionHandler({BadRequestException.class})
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseReponseDTO<Object> handlerBadRequestException(BadRequestException badRequestException) {
         return BaseReponseDTO.<Object>builder()
-                .code(400)
+                .code(HttpStatus.BAD_REQUEST.value())
+                .isSuccess(Boolean.FALSE)
                 .message(badRequestException.getMessage())
-                .isSuccess(false)
                 .build();
     }
     @ExceptionHandler({SQLException.class})
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseReponseDTO<Object> handlerOracleDatabaseException(SQLException dataIntegrityViolationException) {
         return BaseReponseDTO.<Object>builder()
-                .code(400)
+                .code(HttpStatus.BAD_REQUEST.value())
+                .isSuccess(Boolean.FALSE)
                 .message(dataIntegrityViolationException.getMessage())
-                .isSuccess(false)
                 .build();
     }
     @ExceptionHandler({ConstraintViolationException.class})
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseReponseDTO<Object> handlerConstraintViolationException(ConstraintViolationException constraintViolationException) {
         return BaseReponseDTO.<Object>builder()
-                .code(400)
-                .message("Data is valid")
-                .isSuccess(false)
+                .code(HttpStatus.BAD_REQUEST.value())
+                .isSuccess(Boolean.FALSE)
+                .message(constraintViolationException.getMessage())
                 .build();
     }
     @ExceptionHandler({ResourceNotFoundException.class})
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseReponseDTO<Object> handlerResourceNotFoundException(ResourceNotFoundException resourceNotFoundException) {
         return BaseReponseDTO.<Object>builder()
-                .code(400)
-                .message("Data not found")
-                .isSuccess(false)
+                .code(HttpStatus.BAD_REQUEST.value())
+                .isSuccess(Boolean.FALSE)
+                .message(resourceNotFoundException.getMessage())
                 .build();
     }
     @ExceptionHandler(UnauthorizedException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseReponseDTO<Object> handleIOException (UnauthorizedException exception) {
-        Locale locale = new Locale("en");
         return BaseReponseDTO.builder()
-                .message(messageUtils.getMessageSource(exception.getMessage(), locale))
+                .code(HttpStatus.BAD_REQUEST.value())
                 .isSuccess(Boolean.FALSE)
-                .code(AppConst.STATUS_FAIL)
+                .message(exception.getMessage())
                 .build();
     }
 }

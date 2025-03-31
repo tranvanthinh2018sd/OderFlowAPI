@@ -13,6 +13,9 @@ public class MessageConst {
     public static final String CREATE_USER_SUCCESS = "user.create.success";
     public static final String USER_ALREDY_EXISTS = "user.alredy.exists";
     public static final String LIST_USER_NOT_FOUND = "list.user.not.found";
+    public static final String EMAIL_NOT_FOUND = "email.not.found";
+    public static final String SAVE_SUCCESS = "save.success";
+    public static final String ID_NOT_FOUND = "id.not.found";
 
     public static final String ROLE_NOT_FOUND = "role.not.found";
     public static final String LIST_CATEGORY_NOT_FOUND = "List Category Not Found";
@@ -30,4 +33,16 @@ public class MessageConst {
     public static final String USERNAME_PASSWORD_WRONG = "username.password.wrong";
     public static final String ACCOUNT_IS_DISABLE = "account.is.disable";
     public static final String ACCOUNT_IS_LOCKED = "account.is.locked";
+
+    public static final String TOKEN_INVALID = "token.invalid";
+
+    public static final String TOKEN_EXPIRED = "token.expired";
+    public static final String MAIL_SEND_SUCCESS = "mail.send.success";
+    public static final String MAIL_SEND_FAIL = "mail.send.fail";
+
+    public static final String LOGIN_SUCCESS = "login.success";
+    public static final String LOGOUT_SUCCESS = "logout.success";
+    public static final String SENT_OTP_SUCCESS = "sent.otp.success";
+
+    public static final String CONFIRM = "confirm";
 }

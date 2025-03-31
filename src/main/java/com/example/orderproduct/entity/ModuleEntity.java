@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = TableConst.OD_MODULE)
+@Table(name = TableConst.MODULE)
 public class ModuleEntity {
     @Id
     @SequenceGenerator(name = TableConst.SEQ_MODULE, sequenceName = TableConst.SEQ_MODULE, allocationSize = 1)

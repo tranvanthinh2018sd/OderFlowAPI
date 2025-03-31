@@ -32,4 +32,11 @@ public class UserReponseDTO {
         this.address = address;
         this.status = status;
     }
+    public UserReponseDTO( String username, String email, String phone, String image, String address) {
+        this.username = username;
+        this.email = email;
+        this.phone = phone;
+        this.image = image;
+        this.address = address;
+    }
 }

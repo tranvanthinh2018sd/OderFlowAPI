@@ -11,6 +11,7 @@ import com.example.orderproduct.repository.RoleRepository;
 import com.example.orderproduct.repository.UserRepository;
 import com.example.orderproduct.repository.UserRoleRepository;
 import com.example.orderproduct.service.MailService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,13 +22,11 @@ import java.util.List;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
-    @Autowired
-    private UserRoleRepository userRoleRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     public UserReponseDTO toUserGetResponseDTO(UserEntity userEntity) {
         Long id = userEntity.getId();

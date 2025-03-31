@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Locale;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -19,7 +21,7 @@ public class CommonController {
     private final MailService mailService;
 
     @PostMapping("/send-email")
-    public BaseReponseDTO<String> sendEmail(@RequestParam String to, @RequestParam String subject, @RequestParam String content, @RequestParam(required = false) MultipartFile[] files) throws MessagingException {
-        return mailService.sendSimpleMail(to,subject,content,files);
+    public BaseReponseDTO<String> sendEmail(@RequestParam String to, @RequestParam String subject, @RequestParam String content, @RequestParam(required = false) MultipartFile[] files, Locale locale) throws MessagingException {
+        return mailService.sendSimpleMail(to,subject,content,files, locale);
     }
 }

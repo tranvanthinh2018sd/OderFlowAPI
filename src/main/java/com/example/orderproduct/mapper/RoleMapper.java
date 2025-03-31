@@ -10,6 +10,7 @@ import com.example.orderproduct.exception.ResourceNotFoundException;
 import com.example.orderproduct.repository.ModuleRepository;
 import com.example.orderproduct.repository.RoleModuleReponsitory;
 import com.example.orderproduct.repository.RoleRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class RoleMapper {
-    @Autowired
-    private ModuleRepository moduleRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private RoleModuleReponsitory roleModuleReponsitory;
+
+    private final ModuleRepository moduleRepository;
+    private final RoleRepository roleRepository;
+    private final RoleModuleReponsitory roleModuleReponsitory;
     public RoleReponseDTO toRoleReponseDTO(RoleEntity role, List<Long> moduleId) {
         RoleReponseDTO roleReponseDTO = new RoleReponseDTO();
         roleReponseDTO.setId(role.getId());

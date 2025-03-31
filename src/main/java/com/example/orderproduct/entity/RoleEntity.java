@@ -13,7 +13,7 @@ import org.hibernate.internal.build.AllowNonPortable;
 @AllowNonPortable
 @NoArgsConstructor
 @Entity
-@Table(name = TableConst.OD_ROLE)
+@Table(name = TableConst.ROLE)
 public class RoleEntity {
 
     @Id

@@ -11,8 +11,9 @@ import com.example.orderproduct.mapper.RoleMapper;
 import com.example.orderproduct.repository.RoleModuleReponsitory;
 import com.example.orderproduct.repository.RoleRepository;
 import com.example.orderproduct.service.RoleService;
+import com.example.orderproduct.utils.ResponseUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
@@ -22,23 +23,19 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private RoleMapper roleMapper;
-    @Autowired
-    private RoleModuleReponsitory roleModuleReponsitory;
-    @Autowired
-    private MessageSource messageSource;
+
+    private final RoleRepository roleRepository;
+    private final RoleMapper roleMapper;
+    private final RoleModuleReponsitory roleModuleReponsitory;
+    private final MessageSource messageSource;
 
     @Override
     public BaseReponseDTO<List<RoleEntity>> getAllRoles(String search,int page, int size, Locale locale) {
         try{
             int offset = page * size;
-            // Đếm tổng số phần tử
             int totalElements = roleRepository.countPagin(search);
-            // Tổng số page
             int totalPages = (int) Math.ceil((double) totalElements / size);
             List<RoleEntity> roleEntity= roleRepository.findAll(search,offset, size);
             PaginationReponseDTO paginationReponseDTO = PaginationReponseDTO.builder()
@@ -48,27 +45,15 @@ public class RoleServiceImpl implements RoleService {
                     .size(size)
                     .build();
             if(roleEntity.isEmpty()){
-                return BaseReponseDTO.<List<RoleEntity>>builder()
-                        .code(-1)
-                        .isSuccess(false)
-                        .message(messageSource.getMessage(MessageConst.LIST_ROLE_NOT_FOUND,null, locale))
-                        .pagination(null)
-                        .data(roleEntity)
-                        .build();
+                return ResponseUtils.buildResponse(-1, MessageConst.LIST_ROLE_NOT_FOUND, locale, null,null, messageSource);
             }
-            return BaseReponseDTO.<List<RoleEntity>>builder()
-                    .code(0)
-                    .isSuccess(true)
-                    .message(messageSource.getMessage(MessageConst.GET_DATA_SUCCESS,null, locale))
-                    .pagination(paginationReponseDTO)
-                    .data(roleEntity)
-                    .build();
+            return ResponseUtils.buildResponse(0, MessageConst.GET_DATA_SUCCESS, locale, paginationReponseDTO,null, messageSource);
+
         } catch (Exception e) {
             return BaseReponseDTO.<List<RoleEntity>>builder()
                     .code(-2)
                     .isSuccess(true)
                     .message(e.getMessage())
-                    .pagination(null)
                     .data(null)
                     .build();
         }
@@ -79,22 +64,13 @@ public class RoleServiceImpl implements RoleService {
         try{
             RoleEntity roleEntity = roleRepository.findById(id).orElse(null);
             if(roleEntity == null){
-                return BaseReponseDTO.<RoleReponseDTO>builder()
-                        .code(-1)
-                        .isSuccess(true)
-                        .message(messageSource.getMessage(MessageConst.ROLE_NOT_FOUND,null, locale))
-                        .data(null)
-                        .build();
+                return ResponseUtils.buildResponse(-1, MessageConst.ROLE_NOT_FOUND, locale, null,null, messageSource);
             }
             List<Long> moduleId = roleModuleReponsitory.findByRoleId(roleEntity.getId()).stream().map(RoleModuleEntity::getModuleId).collect(Collectors.toList());
             RoleReponseDTO reponseDTO = roleMapper.toRoleReponseDTO(roleEntity, moduleId);
 
-            return BaseReponseDTO.<RoleReponseDTO>builder()
-                    .code(0)
-                    .isSuccess(true)
-                    .message(messageSource.getMessage(MessageConst.GET_DATA_SUCCESS,null, locale))
-                    .data(reponseDTO)
-                    .build();
+            return ResponseUtils.buildResponse(0, MessageConst.GET_DATA_SUCCESS, locale, null,reponseDTO, messageSource);
+
         } catch (Exception e) {
             return BaseReponseDTO.<RoleReponseDTO>builder()
                     .code(-2)
@@ -110,16 +86,11 @@ public class RoleServiceImpl implements RoleService {
        try{
            RoleEntity roleEntity = roleMapper.createRole(requestDTO,requestDTO.getModuleId());
            RoleReponseDTO reponseDTO = roleMapper.toRoleReponseDTO(roleEntity,requestDTO.getModuleId());
-           return BaseReponseDTO.<RoleReponseDTO>builder()
-                   .code(0)
-                   .isSuccess(true)
-                   .message(messageSource.getMessage(MessageConst.GET_DATA_SUCCESS,null, locale))
-                   .data(reponseDTO)
-                   .build();
+           return  ResponseUtils.buildResponse(0, MessageConst.GET_DATA_SUCCESS, locale, null,reponseDTO, messageSource);
        }
        catch (Exception e){
            return BaseReponseDTO.<RoleReponseDTO>builder()
-                   .code(-2)
+                   .code(-1)
                    .isSuccess(false)
                    .message(e.getMessage())
                    .data(null)
@@ -131,20 +102,11 @@ public class RoleServiceImpl implements RoleService {
         try{
             RoleReponseDTO reponseDTO = roleMapper.updateRole(requestDTO);
             if(reponseDTO == null){
-                return BaseReponseDTO.<RoleReponseDTO>builder()
-                        .code(-1)
-                        .isSuccess(true)
-                        .message(messageSource.getMessage(MessageConst.ROLE_NOT_FOUND,null, locale))
-                        .data(null)
-                        .build();
+                return ResponseUtils.buildResponse(-1, MessageConst.ROLE_NOT_FOUND, locale, null,null, messageSource);
             }
-            return BaseReponseDTO.<RoleReponseDTO>builder()
-                    .code(0)
-                    .isSuccess(true)
-                    .message(messageSource.getMessage(MessageConst.GET_DATA_SUCCESS,null, locale))
-                    .data(reponseDTO)
-                    .build();
+            return ResponseUtils.buildResponse(0, MessageConst.GET_DATA_SUCCESS, locale, null,reponseDTO, messageSource);
         } catch (Exception e) {
+            log.error("#Error"+e.getMessage());
             return BaseReponseDTO.<RoleReponseDTO>builder()
                     .code(-2)
                     .isSuccess(true)

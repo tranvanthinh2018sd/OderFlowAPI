@@ -14,6 +14,7 @@ public interface UserService {
     BaseReponseDTO<List<UserReponseDTO>> getAllUserPaging(String search,int page, int size, Locale locale);
     BaseReponseDTO<UserReponseDTO> getUserById(Long id, Locale locale);
     BaseReponseDTO<UserReponseDTO> createUser(UserRequestDTO request, MultipartFile imageRequest, Locale locale) throws IOException;
-    BaseReponseDTO<UserReponseDTO> updateUser(UserRequestDTO request, Locale locale);
-    BaseReponseDTO <String> confirmUser(Long userId, String verifyCode);
+    BaseReponseDTO<UserReponseDTO> updateUser(UserRequestDTO request, MultipartFile fileImage, Locale locale);
+    BaseReponseDTO <String> confirmUser(Long userId, String verifyCode, Locale locale);
+    BaseReponseDTO<Object> savePassswordForOTP(Long passwordResetTokenId, String token, String password, Locale locale);
 }

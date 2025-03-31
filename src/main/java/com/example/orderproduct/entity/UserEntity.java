@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = TableConst.OD_USER)
+@Table(name = TableConst.USER)
 public class UserEntity {
     @Id
     @SequenceGenerator(name = TableConst.SEQ_USER, sequenceName = TableConst.SEQ_USER, allocationSize = 1)
